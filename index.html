@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Задача о трех тел</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+      canvas{
+        border: 1px solid #000000;
+      }
+      .container{
+        display: inline-block;
+      }
+      .container-1{
+        display: inline;
+        float: left;
+      }
+      .container-2{
+        display: inline;
+        float: left;
+        width: 300px;
+        border: 1px solid green;
+      }
+      input{
+        width:30px;
+      }
+      .point{
+        padding: 10px 10px 10px 0px;
+      }
+      .first-point .add {
+        background-color: red;
+      }
+      .second-point .add {
+        background-color: blue;
+      }
+      .third-point .add {
+        background-color: green;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="container-1">
+        <div class="page-header" id="banner">
+          <div class="row">
+            <canvas id="myCanvas" width="1500" height="600"></canvas>
+          </div>
+          <ul class="list-inline">
+            <div class="main-val">
+              time=
+              <input type="text" class="time" placeholder="15"/>
+              dt=
+              <input type="text" class="dt" placeholder="0.1"/>
+              gravity=
+              <input type="text" class="gravity" placeholder="10"/>
+            </div>
+            <button id="start">Start</button>
+            <button id="stop">Stop</button>
+            <button id="reset">Reset</button>
+          </ul>
+        </div>
+      </div>
+      <div class= "container-2">
+        <div class="first-point point">
+          <div class="coords">
+            Enter coordinates of point 1:
+            <input type="text" class="x-coord" placeholder="x"/>
+            <input type="text" class="y-coord" placeholder="y"/> 
+            <input type="text" class="z-coord" placeholder="z"/> 
+          </div>
+          <div class="v-coords">
+            Enter init v of point 1:
+            <input type="text" class="x-coord" placeholder="x"/>
+            <input type="text" class="y-coord" placeholder="y"/> 
+            <input type="text" class="z-coord" placeholder="z"/> 
+          </div>
+
+          Enter weight of point 1:
+          <input type="text" class="weight" placeholder="m"/> 
+          <br/>
+          <button class="add">Point 1</button>
+        </div>
+        
+        <div class="second-point point">
+          <div class="coords">
+            Enter coordinates of point 2:
+            <input type="text" class="x-coord" placeholder="x"/>
+            <input type="text" class="y-coord" placeholder="y"/> 
+            <input type="text" class="z-coord" placeholder="z"/> 
+          </div>
+          <div class="v-coords">
+            Enter init v of point 2:
+            <input type="text" class="x-coord" placeholder="x"/>
+            <input type="text" class="y-coord" placeholder="y"/> 
+            <input type="text" class="z-coord" placeholder="z"/> 
+          </div>
+          Enter weight of point 2:
+          <input type="text" class="weight" placeholder="m"/> 
+          <br/>
+          <button class="add">Point 2</button>
+        </div>
+
+        <div class="third-point point">
+          <div class="coords">
+            Enter coordinates of point 3:
+            <input type="text" class="x-coord" placeholder="x"/>
+            <input type="text" class="y-coord" placeholder="y"/>
+            <input type="text" class="z-coord" placeholder="z"/>
+          </div>
+          <div class="v-coords">
+            Enter init v of point 3:
+            <input type="text" class="x-coord" placeholder="x"/>
+            <input type="text" class="y-coord" placeholder="y"/>
+            <input type="text" class="z-coord" placeholder="z"/>
+          </div>
+          Enter weight of point 3:
+          <input type="text" class="weight" placeholder="m"/> 
+          <br/>
+          <button class="add">Point 3</button>
+        </div>
+
+      </div>
+    </div>
+    <script src="jquery-1.10.2.min.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>
