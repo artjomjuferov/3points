@@ -1,6 +1,6 @@
 window.gravity = 10; // гравитационная постоянная
 window.dt = 0.1; // шаг по времени
-window.time = 100;
+window.time = 30;
 window.points = new Array(3);
 window.run = false;
 window.pathPoints = new Array();
@@ -303,6 +303,9 @@ var MovePoints = function(points, dt, gravity){
     points[i].x += (points[i].vx + dvx / 2) * dt;
     points[i].y += (points[i].vy + dvy / 2) * dt;
     points[i].z += (points[i].vz + dvz / 2) * dt;
+    // points[i].x += (points[i].vx) * dt;
+    // points[i].y += (points[i].vy) * dt;
+    // points[i].z += (points[i].vz) * dt;
     
     points[i].vx += dvx;
     points[i].vy += dvy;
