@@ -28,6 +28,9 @@
       .point{
         padding: 10px 10px 10px 0px;
       }
+      .x-coord{
+        placeholder:"x";
+      }
       .first-point .add {
         background-color: red;
       }
@@ -37,7 +40,6 @@
       .third-point .add {
         background-color: green;
       }
-
     </style>
   </head>
   <body>
@@ -50,9 +52,9 @@
           <ul class="list-inline">
             <div class="main-val">
               time=
-              <input type="text" class="time" placeholder="15"/>
+              <input type="text" class="time" placeholder="20"/>
               dt=
-              <input type="text" class="dt" placeholder="0.1"/>
+              <input type="text" class="dt" placeholder="0.01"/>
               gravity=
               <input type="text" class="gravity" placeholder="10"/>
             </div>
@@ -68,13 +70,11 @@
             Enter coordinates of point 1:
             <input type="text" class="x-coord" placeholder="x"/>
             <input type="text" class="y-coord" placeholder="y"/> 
-            <input type="text" class="z-coord" placeholder="z"/> 
           </div>
           <div class="v-coords">
             Enter init v of point 1:
             <input type="text" class="x-coord" placeholder="x"/>
             <input type="text" class="y-coord" placeholder="y"/> 
-            <input type="text" class="z-coord" placeholder="z"/> 
           </div>
 
           Enter weight of point 1:
@@ -88,13 +88,11 @@
             Enter coordinates of point 2:
             <input type="text" class="x-coord" placeholder="x"/>
             <input type="text" class="y-coord" placeholder="y"/> 
-            <input type="text" class="z-coord" placeholder="z"/> 
           </div>
           <div class="v-coords">
             Enter init v of point 2:
             <input type="text" class="x-coord" placeholder="x"/>
             <input type="text" class="y-coord" placeholder="y"/> 
-            <input type="text" class="z-coord" placeholder="z"/> 
           </div>
           Enter weight of point 2:
           <input type="text" class="weight" placeholder="m"/> 
@@ -106,14 +104,12 @@
           <div class="coords">
             Enter coordinates of point 3:
             <input type="text" class="x-coord" placeholder="x"/>
-            <input type="text" class="y-coord" placeholder="y"/>
-            <input type="text" class="z-coord" placeholder="z"/>
+            <input type="text" class="y-coord" placeholder="y"/> 
           </div>
           <div class="v-coords">
             Enter init v of point 3:
             <input type="text" class="x-coord" placeholder="x"/>
-            <input type="text" class="y-coord" placeholder="y"/>
-            <input type="text" class="z-coord" placeholder="z"/>
+            <input type="text" class="y-coord" placeholder="y"/> 
           </div>
           Enter weight of point 3:
           <input type="text" class="weight" placeholder="m"/> 
@@ -123,7 +119,7 @@
 
       </div>
     </div>
-    <script src="jquery-1.10.2.min.js"></script>
+    <script src="jquery.min.js"></script>
     <script src="main.js"></script>
   </body>
 </html>
