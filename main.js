@@ -1,9 +1,10 @@
 window.gravity = 10; // гравитационная постоянная
-window.dt = 0.01; // шаг по времени
-window.time = 20;
+window.dt = 1; // шаг по времени
+window.time = 100;
 window.points = new Array(3);
 window.run = false;
 window.pathPoints = new Array();
+window.fMax = 1;
 
 $(document).ready(function(){
   window.canvas = document.getElementById('myCanvas'); 
@@ -20,14 +21,24 @@ $(document).ready(function(){
       window.points[0] = (new Point(x, y, "red"));
       $(".first-point").children(".coords").children(".x-coord").val(x);
       $(".first-point").children(".coords").children(".y-coord").val(y);
+      $(".first-point").children(".v-coords").children(".x-coord").val(window.points[0].vx);
+      $(".first-point").children(".v-coords").children(".y-coord").val(window.points[0].vy);
+      $(".first-point").children(".v-coords").children(".x-coord").val(window.points[0].vx);
+      $(".first-point").children(".weight").val(window.points[0].m);
     }else if (window.points[1] === undefined){
       window.points[1] = (new Point(x, y, "blue"));
       $(".second-point").children(".coords").children(".x-coord").val(x);
       $(".second-point").children(".coords").children(".y-coord").val(y);
+      $(".second-point").children(".v-coords").children(".x-coord").val(window.points[1].vx);
+      $(".second-point").children(".v-coords").children(".y-coord").val(window.points[1].vy);
+      $(".second-point").children(".weight").val(window.points[1].m);
     }else if (window.points[2] === undefined){
       window.points[2] = (new Point(x, y, "green"));
       $(".third-point").children(".coords").children(".x-coord").val(x);
       $(".third-point").children(".coords").children(".y-coord").val(y);
+      $(".third-point").children(".v-coords").children(".x-coord").val(window.points[2].vx);
+      $(".third-point").children(".v-coords").children(".y-coord").val(window.points[2].vy);
+      $(".third-point").children(".weight").val(window.points[2].m);
     }else{
       alert("3 points already exist");
     }
@@ -74,6 +85,9 @@ $(document).ready(function(){
   });
   $(".dt").change(function(){
     window.dt = parseFloat($(this).val());
+  });
+  $(".fMax").change(function(){
+    window.fMax = parseFloat($(this).val());
   });
 
 
@@ -216,19 +230,19 @@ function Point(_x, _y, _color, _vx, _vy, _m) {
   this.color = _color;
   
   if (_vx === undefined){
-    this.vx = 0.5-Math.random();
+    this.vx = (0.5-Math.random())/100;
   } else{
     this.vx = _vx;
   } 
   
   if (_vy === undefined){
-    this.vy = 0.5-Math.random();
+    this.vy = (0.5-Math.random())/100;
   } else{
     this.vy = _vy;
   }
     
   if (_m === undefined){
-    this.m = Math.random();
+    this.m = (Math.random())*100;
   } else{
     this.m = _m;
   }
@@ -243,11 +257,17 @@ var CalcForcesSimple = function(points, gravity){
       if ((i == j) || (points[i] === undefined) || (points[j] === undefined)){
         continue;
       } 
-      var dx = points[j].x - points[i].x; 
-      var dy = points[j].y - points[i].y;
-      var fabs = (gravity * points[i].m * points[j].m)/(dx*dx + dy*dy);
-      points[i].forceX = points[i].forceX + fabs * dx * Math.sqrt(dx*dx + dy*dy);
-      points[i].forceY = points[i].forceY + fabs * dy * Math.sqrt(dx*dx + dy*dy);
+      var dx = points[j].x - points[i].x,
+          dy = points[j].y - points[i].y,
+          r_2 = 1 / (dx * dx + dy * dy),
+          r_1 = Math.sqrt(r_2),
+          fabs = window.gravity * points[i].m * points[j].m * r_2;
+  
+      if (fabs > window.fMax)
+          fabs = window.fMax; 
+  
+      points[i].forceX += fabs * dx * r_1;
+      points[i].forceY += fabs * dy * r_1;
     }
   }
 };
@@ -264,69 +284,11 @@ var MovePoints = function(points, dt){
     points[i].x += (points[i].vx + dvx / 2) * dt;
     points[i].y += (points[i].vy + dvy / 2) * dt;
     
-    points[i].vx += dvx;
-    points[i].vy += dvy;
+    points[i].vx = points[i].vx + dvx;
+    points[i].vy = points[i].vy + dvy;
     
     points[i].forceX = 0;
     points[i].forceY = 0;
     
   }
 };
-
-// class TESTER, for comparing results aproximate solution with exact solution 
-
-// m(А)=m(Б)=m(В)
-// все 3(А, Б, В) тела на одной прямой с одним весом, и АБ=БВ и тело Б всегда на месте, скорости нулевые
-// A и В движуться по прямой 
-// return средне арефметическую погрешность отклонение от прямой А и Б
-var onOneLine = function(iterationN, massN, dt, gravity){
-  var error = 0;
-  
-  for(var j = 1; j <= massN; j++){ 
-    var p = [];
-    
-    p[0] = new Point(10,10,"some",0,0,j);
-    p[1] = new Point(20,20,"some",0,0,j);
-    p[2] = new Point(30,30,"some",0,0,j);
-    
-    for(var i = 0; i < iterationN; i++){
-      CalcForcesSimple(p, gravity);
-      MovePoints(p, dt);
-      for(var k = 0; k < p.length; k++){
-        var tmp = p[k].x/p[k].y;
-        error += Math.abs(1-tmp);
-      }
-    }
-  }
-  return error/(iterationN*massN);
-}
-
-// m(А)=m(Б)=m(В)
-// все 3(А, Б, В) тела на одной прямой с одним весом, и АБ=БВ и тело Б всегда на месте, v(Б) = (0,0), v(А)=v(В) = random() 
-// return средне арефметическую погрешность всегда Б на месте
-var onOneLine = function(iterationN, massN, dt, gravity){
-  var error = 0;
-  
-  for(var j = 1; j <= massN; j++){ 
-    var p = [];
-    
-    var vx1 = (1-Math.random())*100;
-    var vy1 = (1-Math.random())*100;
-    var vx3 = (1-Math.random())*100;
-    var vy3 = (1-Math.random())*100;
-    
-    p[0] = new Point(10,10,"some",vx1,vy1,j);
-    p[1] = new Point(20,20,"some",0,0,j);
-    p[2] = new Point(30,30,"some",vx3,vx3,j);
-    
-    for(var i = 0; i < iterationN; i++){
-      CalcForcesSimple(p, gravity);
-      MovePoints(p, dt);
-      for(var k = 0; k < p.length; k++){
-        var tmp = (Math.abs(p.x-20)+Math.abs(p.y-20))/2;
-        error += tmp;
-      }
-    }
-  }
-  return error/(iterationN*massN);
-}
