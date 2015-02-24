@@ -47,23 +47,8 @@
       <div class="container-1">
         <div class="page-header" id="banner">
           <div class="row">
-            <canvas id="myCanvas" width="1020" height="500"></canvas>
+            <canvas id="myCanvas" width="510" height="500"></canvas>
           </div>
-          <ul class="list-inline">
-            <div class="main-val">
-              time=
-              <input type="text" class="time" placeholder="100"/>
-              dt=
-              <input type="text" class="dt" placeholder="1"/>
-              gravity=
-              <input type="text" class="gravity" placeholder="10"/>
-              fMax=
-              <input type="text" class="fMax" placeholder="1"/>
-            </div>
-            <button id="start">Start</button>
-            <button id="stop">Stop</button>
-            <button id="reset">Reset</button>
-          </ul>
         </div>
       </div>
       <div class= "container-2">
@@ -118,8 +103,27 @@
           <br/>
           <button class="add">Point 3</button>
         </div>
-
+        <div>
+          <br/>
+          <button id="lagrande">Lagrandge</button>
+          <br/><br/><br/><br/><br/>
+            <div class="main-val">
+              time=
+              <input type="text" class="time" placeholder="10"/>
+              dt=
+              <input type="text" class="dt" placeholder="0.5"/>
+              G=
+              <input type="text" class="gravity" placeholder="10"/>
+              fMax=
+              <input type="text" class="fMax" placeholder="1"/>
+            </div>
+            <button id="start">Start</button>
+            <button id="stop">Stop</button>
+            <button id="reset">Reset</button>
+        </div>
       </div>
+      
+      <canvas id="myCanvas2" width="510" height="500"></canvas>
     </div>
     <script src="jquery.min.js"></script>
     <script src="main.js"></script>

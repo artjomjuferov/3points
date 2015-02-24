@@ -1,13 +1,16 @@
 window.gravity = 10; // гравитационная постоянная
-window.dt = 1; // шаг по времени
-window.time = 100;
+window.dt = 2.7; // шаг по времени
+window.time = 150;
 window.points = new Array(3);
 window.run = false;
 window.pathPoints = new Array();
+window.pathPoints2 = new Array();
+window.points2 = new Array(3);
 window.fMax = 1;
 
 $(document).ready(function(){
   window.canvas = document.getElementById('myCanvas'); 
+  window.canvas2 = document.getElementById('myCanvas2'); 
 
 
   $("#myCanvas").click(function(ev){
@@ -19,6 +22,7 @@ $(document).ready(function(){
   
     if (window.points[0] === undefined){
       window.points[0] = (new Point(x, y, "red"));
+      window.points2[0] =  $.extend({}, window.points[0]);
       $(".first-point").children(".coords").children(".x-coord").val(x);
       $(".first-point").children(".coords").children(".y-coord").val(y);
       $(".first-point").children(".v-coords").children(".x-coord").val(window.points[0].vx);
@@ -27,6 +31,7 @@ $(document).ready(function(){
       $(".first-point").children(".weight").val(window.points[0].m);
     }else if (window.points[1] === undefined){
       window.points[1] = (new Point(x, y, "blue"));
+      window.points2[1] =  $.extend({}, window.points[1]);
       $(".second-point").children(".coords").children(".x-coord").val(x);
       $(".second-point").children(".coords").children(".y-coord").val(y);
       $(".second-point").children(".v-coords").children(".x-coord").val(window.points[1].vx);
@@ -34,6 +39,7 @@ $(document).ready(function(){
       $(".second-point").children(".weight").val(window.points[1].m);
     }else if (window.points[2] === undefined){
       window.points[2] = (new Point(x, y, "green"));
+      window.points2[2] =  $.extend({}, window.points[2]);
       $(".third-point").children(".coords").children(".x-coord").val(x);
       $(".third-point").children(".coords").children(".y-coord").val(y);
       $(".third-point").children(".v-coords").children(".x-coord").val(window.points[2].vx);
@@ -43,9 +49,10 @@ $(document).ready(function(){
       alert("3 points already exist");
     }
 
-    ctx.drawAllPoints(window.points);
+    ctx.drawAllPoints(window.points, window.pathPoints);
+    window.canvas2.getContext('2d').drawAllPoints(window.points, window.pathPoints2);
   });
-
+  
   $("#stop").click(function () {
     stop();
     $('#status').html("stopped");
@@ -58,14 +65,15 @@ $(document).ready(function(){
     var ctx = window.canvas.getContext('2d');
     ctx.clearCanvas(window.canvas);
     
-    for (var x in window.pathPoints) {
-      for (var y in window.pathPoints[x]){
-        window.pathPoints[x][y] = undefined;
-      }
-      window.pathPoints[x] = undefined;
-    }
+    var ctx2 = window.canvas2.getContext('2d');
+    ctx2.clearCanvas(window.canvas2);
+    
     window.pathPoints = [];
-    window.canvas.getContext('2d').drawAllPoints(window.points);
+    
+    window.canvas.getContext('2d').drawAllPoints(window.points, window.pathPoints);
+    
+    window.pathPoints2 = [];
+    window.canvas2.getContext('2d').drawAllPoints(window.points2, window.pathPoints2);
     
   });
 
@@ -90,6 +98,32 @@ $(document).ready(function(){
     window.fMax = parseFloat($(this).val());
   });
 
+  $("#lagrande").click(function(){
+      window.points[0] = (new Point(100, 300, "red", 0, 1, 1));
+      window.points2[0] =  $.extend({}, window.points[0]);
+      $(".first-point").children(".coords").children(".x-coord").val(window.points[0].x);
+      $(".first-point").children(".coords").children(".y-coord").val(window.points[0].y);
+      $(".first-point").children(".v-coords").children(".x-coord").val(window.points[0].vx);
+      $(".first-point").children(".v-coords").children(".y-coord").val(window.points[0].vy);
+      $(".first-point").children(".weight").val(window.points[0].m);
+      window.points[1] = (new Point(200, 300, "blue", 0, 0, 10));
+      window.points2[1] =  $.extend({}, window.points[1]);
+      $(".second-point").children(".coords").children(".x-coord").val(window.points[1].x);
+      $(".second-point").children(".coords").children(".y-coord").val(window.points[1].y);
+      $(".second-point").children(".v-coords").children(".x-coord").val(window.points[1].vx);
+      $(".second-point").children(".v-coords").children(".y-coord").val(window.points[1].vy);
+      $(".second-point").children(".weight").val(window.points[1].m);
+      window.points[2] = (new Point(300, 300, "green", 0, -1, 1));
+      window.points2[2] =  $.extend({}, window.points[2]);
+      $(".third-point").children(".coords").children(".x-coord").val(window.points[2].x);
+      $(".third-point").children(".coords").children(".y-coord").val(window.points[2].y);
+      $(".third-point").children(".v-coords").children(".x-coord").val(window.points[2].vx);
+      $(".third-point").children(".v-coords").children(".y-coord").val(window.points[2].vy);
+      $(".third-point").children(".weight").val(window.points[2].m);
+      window.canvas.getContext('2d').drawAllPoints(window.points, window.pathPoints);
+    
+      window.canvas2.getContext('2d').drawAllPoints(window.points2, window.pathPoints2);  
+  });
 
   $(".add").click(function(){
     var form = $(this).parent();
@@ -130,17 +164,17 @@ $(document).ready(function(){
 
     var ctx = window.canvas.getContext('2d');
     ctx.clearCanvas(window.canvas);
-    ctx.drawAllPoints(window.points);
+    ctx.drawAllPoints(window.points, window.pathPoints);
+    
+    ctx = window.canvas2.getContext('2d');
+    ctx.drawAllPoints(window.points2, window.pathPoints2);
   });
 
 });
 
-var addToPathArr = function(point) {
+var addToPathArr = function(point, pathPoints) {
   var x = point.x;
   var y = point.y;
-  if (window.pathPoints[x] === undefined){
-    window.pathPoints[x] = new Array();
-  }
   var color;
   if (point.color === "green"){
     color = "#CEF6C1";
@@ -150,17 +184,7 @@ var addToPathArr = function(point) {
      color = "#A2B1F1";
   }
   var newPoint = new Point(x, y, color);
-  window.pathPoints[x][y] = newPoint;
-};
-
-var CalcAndDraw = function(points){
-  CalcForcesSimple(points, window.gravity);
-  MovePoints(points, window.dt);
-
-  var ctx = window.canvas.getContext('2d');
-  ctx.clearCanvas(window.canvas);
-
-  ctx.drawAllPoints(points);
+  pathPoints.push(newPoint);
 };
 
 
@@ -173,17 +197,15 @@ CanvasRenderingContext2D.prototype.drawPoint = function (point, r){
   this.fill();
   this.stroke();
 };
-CanvasRenderingContext2D.prototype.drawAllPoints = function (points){
-  for (var x in window.pathPoints) {
-    for (var y in window.pathPoints[x]){
-      this.drawPoint(window.pathPoints[x][y], 1);
-    }
+CanvasRenderingContext2D.prototype.drawAllPoints = function (points, pathPoints){
+  for (var x in pathPoints) {
+      this.drawPoint(pathPoints[x], 1);
   }
   
   for (var i = 0; i < points.length; i++) {
       if (points[i] !== undefined){
         this.drawPoint(points[i], 5);
-        addToPathArr(points[i]);
+        addToPathArr(points[i], pathPoints);
       } 
   };
   
@@ -251,7 +273,7 @@ function Point(_x, _y, _color, _vx, _vy, _m) {
   this.forceY = 0;
 }
 
-var CalcForcesSimple = function(points, gravity){
+var CalcForces = function(points){
    for (var i = 0; i < points.length; i++) {
     for (var j = 0; j < points.length; j++) {
       if ((i == j) || (points[i] === undefined) || (points[j] === undefined)){
@@ -259,36 +281,251 @@ var CalcForcesSimple = function(points, gravity){
       } 
       var dx = points[j].x - points[i].x,
           dy = points[j].y - points[i].y,
-          r_2 = 1 / (dx * dx + dy * dy),
-          r_1 = Math.sqrt(r_2),
-          fabs = window.gravity * points[i].m * points[j].m * r_2;
+          r = Math.sqrt(dx * dx + dy * dy),
+          fabs = window.gravity * points[i].m * points[j].m / (r*r);
   
-      if (fabs > window.fMax)
-          fabs = window.fMax; 
-  
-      points[i].forceX += fabs * dx * r_1;
-      points[i].forceY += fabs * dy * r_1;
+      points[i].forceX += fabs / r;
+      points[i].forceY += fabs / r;
     }
   }
 };
 
-var MovePoints = function(points, dt){
+var CalcForcesWith = function(points){
+   for (var i = 0; i < points.length; i++) {
+    for (var j = 0; j < points.length; j++) {
+      if ((i == j) || (points[i] === undefined) || (points[j] === undefined)){
+        continue;
+      } 
+      var dx = points[j].x - points[i].x,
+          dy = points[j].y - points[i].y,
+          r = Math.sqrt(dx * dx + dy * dy),
+          fabs = window.gravity * points[i].m * points[j].m / (r*r);
+  
+      if (fabs > window.fMax)
+          fabs = window.fMax; 
+  
+      points[i].forceX += fabs * dx / r;
+      points[i].forceY += fabs * dy / r;
+    }
+  }
+};
+
+
+var EulerMethod = function(points){
+  CalcForces(points);
   for (var i = 0; i < points.length; i++) {
     if (points[i] === undefined){
       continue;
     }
+    // F=ma
+    var aX = points[i].forceX* window.dt / points[i].m;
+    var aY = points[i].forceY* window.dt / points[i].m;
     
-    var dvx = points[i].forceX * dt / points[i].m;
-    var dvy = points[i].forceY * dt / points[i].m;
+    points[i].x += (points[i].vx + aX/2) * window.dt;
+    points[i].y += (points[i].vy + aY/2) * window.dt;
     
-    points[i].x += (points[i].vx + dvx / 2) * dt;
-    points[i].y += (points[i].vy + dvy / 2) * dt;
-    
-    points[i].vx = points[i].vx + dvx;
-    points[i].vy = points[i].vy + dvy;
+    points[i].vx = points[i].vx + aX;
+    points[i].vy = points[i].vy + aY;
     
     points[i].forceX = 0;
     points[i].forceY = 0;
     
   }
 };
+
+
+var EulerMethodBetter = function(points){
+  CalcForcesWith(points);
+  for (var i = 0; i < points.length; i++) {
+    if (points[i] === undefined){
+      continue;
+    }
+    
+    var aX = points[i].forceX* window.dt / points[i].m;
+    var aY = points[i].forceY* window.dt / points[i].m;
+    
+    points[i].x += (points[i].vx + aX/2) * window.dt;
+    points[i].y += (points[i].vy + aY/2) * window.dt;
+    
+    points[i].vx = points[i].vx + aX;
+    points[i].vy = points[i].vy + aY;
+    
+    points[i].forceX = 0;
+    points[i].forceY = 0;
+    
+  }
+};
+
+
+function P(_x, _y){
+  this.x = _x;
+  this.y = _y;
+}
+
+
+
+// ds/dt = v
+// dv/dt = a
+var a = function(i, points, parX, parY){
+  var acc = new P(0, 0);
+  
+  for (var j = 0; j < 3; j++) {
+    if (i == j) continue;
+    
+    var dx = points[i].x + parX - points[j].x ,
+        dy = points[i].y + parY - points[j].y,
+        r = Math.sqrt(dx * dx + dy * dy);
+    
+    acc.x += window.gravity * points[j].m/(r*r) ;
+    acc.y += window.gravity * points[j].m/(r*r);
+  }
+  
+  return acc;
+}
+
+
+var RungaKut = function(points){
+  CalcForces(points);
+  
+  // first 3 it's V, second 3 A
+  var k1X = [], k1Y = [], k2X = [], k2Y = [],
+      l1X = [], l1Y = [], l2X = [], l2Y = [],
+      k3X = [], k3Y = [], k4X = [], k4Y = [],
+      l3X = [], l3Y = [], l4X = [], l4Y = [],
+      acc;
+    
+  //k1
+  for (var i = 0; i < 3; i++) {
+    k1X[i] = points[i].vx;
+    k1Y[i] = points[i].vy; 
+    
+    acc = a(i, points, 0 ,0 );
+    l1X[i] = acc.x;
+    l1Y[i] = acc.y;
+  }
+  
+  //k2
+  for (var i = 0; i < 3; i++) {
+    k2X[i] = points[i].vx + l1X[i]*window.dt/2;
+    k2Y[i] = points[i].vy + l1Y[i]*window.dt/2; 
+  
+    acc = a(i, points, l1X[i]*window.dt/2, l1Y[i]*window.dt/2);
+    l2X[i] = acc.x;
+    l2Y[i] = acc.y;
+  }
+  
+  
+  //k3
+  for (var i = 0; i < 3; i++) {
+    k3X[i] = points[i].vx + l2X[i]*window.dt/2;
+    k3Y[i] = points[i].vy + l2Y[i]*window.dt/2; 
+  
+    acc = a(i, points, l2X[i]*window.dt/2, l2Y[i]*window.dt/2);
+    l3X[i] = acc.x;
+    l3Y[i] = acc.y;
+  }
+   
+  //k4
+  for (var i = 0; i < 3; i++) {
+    k4X[i] = points[i].vx + l3X[i]*window.dt/2;
+    k4Y[i] = points[i].vy + l3Y[i]*window.dt/2; 
+    
+    acc = a(i, points, l3X[i]*window.dt, l3Y[i]*window.dt);
+    l4X[i] = acc.x;
+    l4Y[i] = acc.y;
+  }
+   
+  
+  for (var i = 0; i < 3; i++) {
+    points[i].x += window.dt*(k1X[i]+2*k2X[i]+2*k3X[i]+k4X[i])/6;
+    points[i].y += window.dt*(k1Y[i]+2*k2Y[i]+2*k3Y[i]+k4Y[i])/6;
+    points[i].vx += window.dt*(l1X[i]+2*l2X[i]+2*l3X[i]+l4X[i])/6;
+    points[i].vy += window.dt*(l1Y[i]+2*l2Y[i]+2*l3Y[i]+l4Y[i])/6;
+  }
+};
+
+
+var CalcAndDraw = function(points){
+ 
+  // first method
+  var ctx = window.canvas.getContext('2d');
+  ctx.clearCanvas(window.canvas);
+  RungaKut(points);
+  ctx.drawAllPoints(points, window.pathPoints);
+  // second method
+  
+  ctx = window.canvas2.getContext('2d');
+  ctx.clearCanvas(window.canvas2);
+  EulerMethodBetter(window.points2);
+  ctx.drawAllPoints(window.points2, window.pathPoints2);
+};
+
+function getMass(points){
+  var mass={x:0,y:0};
+  for(var i=0;i<3;i++){
+    mass.x += points[i].m*points[i].x;
+    mass.y += points[i].m*points[i].y;
+  }
+  mass.x /= 3;
+  mass.y /= 3;
+  return mass;
+}
+
+function functionName(fun) {
+  var ret = fun.toString();
+  ret = ret.substr('function '.length);
+  ret = ret.substr(0, ret.indexOf('('));
+  return ret;
+}
+
+function TestM(funcSolve, points){
+  console.log("\nЗакон сохранения центра масс");
+  var normal = getMass(points);
+  var result = {x:0, y:0};
+  for(var i=0;i<10000;i++){
+    funcSolve(points);
+    var m = getMass(points);
+    result.x += (normal.x-m.x)*(normal.x-m.x); 
+    result.y += (normal.y-m.y)*(normal.y-m.y);
+  }
+  result.x = Math.sqrt(result.x);
+  result.y = Math.sqrt(result.y);
+  console.log(result);
+  return result;
+}
+
+function getI(points){
+  var mass={x:0,y:0};
+  for(var i=0;i<3;i++){
+    mass.x += points[i].m*points[i].vx;
+    mass.y += points[i].m*points[i].vy;
+  }
+  return mass;
+}
+function TestI(funcSolve, points){
+  console.log("\nЗакон сохранения импульса");
+  var normal = getI(points);
+  var result = {x:0, y:0};
+  for(var i=0;i<10000;i++){
+    funcSolve(points);
+    var m = getI(points);
+    result.x += (normal.x-m.x)*(normal.x-m.x); 
+    result.y += (normal.y-m.y)*(normal.y-m.y);
+    // console.log(result);
+  }
+  result.x = Math.sqrt(result.x);
+  result.y = Math.sqrt(result.y);
+  console.log(result);
+  return result;
+}
+
+// var points = [];
+// points[0] = (new Point(201, 301, "red", -0.2, 0, 1));
+// points[1] = (new Point(100, 300, "green", 0.2, 0, 1));
+// points[2] = (new Point(502, 304, "blue", 0, 0, 1));
+// TestM(EulerMethod, points);
+
+// points[0] = (new Point(201, 301, "red", -0.1, 0, 1));
+// points[1] = (new Point(100, 300, "green", 0, 0, 1));
+// points[2] = (new Point(502, 304, "blue", 0, 0, 1));
+// TestM(EulerMethodBetter, points);
