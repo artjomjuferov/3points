@@ -384,79 +384,19 @@ var a = function(i, points, parX, parY){
 }
 
 
-var RungaKut = function(points){
-  CalcForces(points);
-  
-  // first 3 it's V, second 3 A
-  var k1X = [], k1Y = [], k2X = [], k2Y = [],
-      l1X = [], l1Y = [], l2X = [], l2Y = [],
-      k3X = [], k3Y = [], k4X = [], k4Y = [],
-      l3X = [], l3Y = [], l4X = [], l4Y = [],
-      acc;
-    
-  //k1
-  for (var i = 0; i < 3; i++) {
-    k1X[i] = points[i].vx;
-    k1Y[i] = points[i].vy; 
-    
-    acc = a(i, points, 0 ,0 );
-    l1X[i] = acc.x;
-    l1Y[i] = acc.y;
-  }
-  
-  //k2
-  for (var i = 0; i < 3; i++) {
-    k2X[i] = points[i].vx + l1X[i]*window.dt/2;
-    k2Y[i] = points[i].vy + l1Y[i]*window.dt/2; 
-  
-    acc = a(i, points, l1X[i]*window.dt/2, l1Y[i]*window.dt/2);
-    l2X[i] = acc.x;
-    l2Y[i] = acc.y;
-  }
-  
-  
-  //k3
-  for (var i = 0; i < 3; i++) {
-    k3X[i] = points[i].vx + l2X[i]*window.dt/2;
-    k3Y[i] = points[i].vy + l2Y[i]*window.dt/2; 
-  
-    acc = a(i, points, l2X[i]*window.dt/2, l2Y[i]*window.dt/2);
-    l3X[i] = acc.x;
-    l3Y[i] = acc.y;
-  }
-   
-  //k4
-  for (var i = 0; i < 3; i++) {
-    k4X[i] = points[i].vx + l3X[i]*window.dt/2;
-    k4Y[i] = points[i].vy + l3Y[i]*window.dt/2; 
-    
-    acc = a(i, points, l3X[i]*window.dt, l3Y[i]*window.dt);
-    l4X[i] = acc.x;
-    l4Y[i] = acc.y;
-  }
-   
-  
-  for (var i = 0; i < 3; i++) {
-    points[i].x += window.dt*(k1X[i]+2*k2X[i]+2*k3X[i]+k4X[i])/6;
-    points[i].y += window.dt*(k1Y[i]+2*k2Y[i]+2*k3Y[i]+k4Y[i])/6;
-    points[i].vx += window.dt*(l1X[i]+2*l2X[i]+2*l3X[i]+l4X[i])/6;
-    points[i].vy += window.dt*(l1Y[i]+2*l2Y[i]+2*l3Y[i]+l4Y[i])/6;
-  }
-};
-
 
 var CalcAndDraw = function(points){
  
   // first method
   var ctx = window.canvas.getContext('2d');
   ctx.clearCanvas(window.canvas);
-  RungaKut(points);
+  EulerMethodBetter(points);
   ctx.drawAllPoints(points, window.pathPoints);
-  // second method
   
+  // second method
   ctx = window.canvas2.getContext('2d');
   ctx.clearCanvas(window.canvas2);
-  EulerMethodBetter(window.points2);
+  EulerMethod(window.points2);
   ctx.drawAllPoints(window.points2, window.pathPoints2);
 };
 
@@ -479,6 +419,7 @@ function functionName(fun) {
 }
 
 function TestM(funcSolve, points){
+  // initial v must be nil
   console.log("\nЗакон сохранения центра масс");
   var normal = getMass(points);
   var result = {x:0, y:0};
@@ -519,6 +460,23 @@ function TestI(funcSolve, points){
   return result;
 }
 
+
+// m(А)=m(Б)=m(В)
+// все 3(А, Б, В) тела на одной прямой с одной массой, и АБ=БВ и тело Б всегда на месте, скорости нулевые
+// A и В движуться по прямой 
+var TestOnOneLine = function(method, points){
+  var error = 0;
+  for(var j = 1; j <= 10000; j++){ 
+      method(points);
+      var tmp = p[0].x/p[0].y;
+      for(var k = 1; k < 2; k++){
+        error += (tmp-p[k].x/p[k].y)*(tmp-p[k].x/p[k].y);
+      }
+  }
+  return Math.Sqrt(error);
+}
+
+
 // var points = [];
 // points[0] = (new Point(201, 301, "red", -0.2, 0, 1));
 // points[1] = (new Point(100, 300, "green", 0.2, 0, 1));
@@ -529,3 +487,86 @@ function TestI(funcSolve, points){
 // points[1] = (new Point(100, 300, "green", 0, 0, 1));
 // points[2] = (new Point(502, 304, "blue", 0, 0, 1));
 // TestM(EulerMethodBetter, points);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var RungaKut = function(points){
+  CalcForces(points);
+  
+  // k1 = v
+  // l1 = a(s)
+  var k1X = [], k1Y = [], k2X = [], k2Y = [],
+      l1X = [], l1Y = [], l2X = [], l2Y = [],
+      k3X = [], k3Y = [], k4X = [], k4Y = [],
+      l3X = [], l3Y = [], l4X = [], l4Y = [],
+      acc;
+    
+  //k1
+  for (var i = 0; i < 3; i++) {
+    k1X[i] = points[i].vx;
+    k1Y[i] = points[i].vy; 
+    
+    acc = a(i, points, 0 ,0 );
+    l1X[i] = acc.x;
+    l1Y[i] = acc.y;
+  }
+  
+  //k2
+  for (var i = 0; i < 3; i++) {
+    k2X[i] = points[i].vx + l1X[i]*window.dt/2;
+    k2Y[i] = points[i].vy + l1Y[i]*window.dt/2; 
+  
+    acc = a(i, points, l1X[i]*window.dt/2, l1Y[i]*window.dt/2);
+    l2X[i] = acc.x;
+    l2Y[i] = acc.y;
+  }
+  
+  
+  //k3
+  for (var i = 0; i < 3; i++) {
+    k3X[i] = points[i].vx + l2X[i]*window.dt/2;
+    k3Y[i] = points[i].vy + l2Y[i]*window.dt/2; 
+  
+    acc = a(i, points, l2X[i]*window.dt/2, l2Y[i]*window.dt/2);
+    l3X[i] = acc.x;
+    l3Y[i] = acc.y;
+  }
+   
+  //k4
+  for (var i = 0; i < 3; i++) {
+    k4X[i] = points[i].vx + l3X[i]*window.dt;
+    k4Y[i] = points[i].vy + l3Y[i]*window.dt; 
+    
+    acc = a(i, points, l3X[i]*window.dt, l3Y[i]*window.dt);
+    l4X[i] = acc.x;
+    l4Y[i] = acc.y;
+  }
+   
+  
+  for (var i = 0; i < 3; i++) {
+    points[i].x += window.dt*(k1X[i]+2*k2X[i]+2*k3X[i]+k4X[i])/6;
+    points[i].y += window.dt*(k1Y[i]+2*k2Y[i]+2*k3Y[i]+k4Y[i])/6;
+    points[i].vx += window.dt*(l1X[i]+2*l2X[i]+2*l3X[i]+l4X[i])/6;
+    points[i].vy += window.dt*(l1Y[i]+2*l2Y[i]+2*l3Y[i]+l4Y[i])/6;
+  }
+};
