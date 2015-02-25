@@ -284,71 +284,64 @@ var CalcForces = function(points){
           r = Math.sqrt(dx * dx + dy * dy),
           fabs = window.gravity * points[i].m * points[j].m / (r*r);
   
-      points[i].forceX += fabs / r;
-      points[i].forceY += fabs / r;
-    }
-  }
-};
-
-var CalcForcesWith = function(points){
-   for (var i = 0; i < points.length; i++) {
-    for (var j = 0; j < points.length; j++) {
-      if ((i == j) || (points[i] === undefined) || (points[j] === undefined)){
-        continue;
-      } 
-      var dx = points[j].x - points[i].x,
-          dy = points[j].y - points[i].y,
-          r = Math.sqrt(dx * dx + dy * dy),
-          fabs = window.gravity * points[i].m * points[j].m / (r*r);
-  
-      if (fabs > window.fMax)
-          fabs = window.fMax; 
-  
       points[i].forceX += fabs * dx / r;
       points[i].forceY += fabs * dy / r;
     }
   }
 };
 
+// ds/dt = v
+// dv/dt = a
+var a = function(i, points, parX, parY){
+  var acc = new P(0, 0);
+  
+  var fX =0, fY=0;
+  for (var j = 0; j < 3; j++) {
+    if (i == j) continue;
+    
+    var dx = points[j].x - (points[i].x + parX),
+        dy = points[j].y - (points[i].y + parY),
+        r = Math.sqrt(dx * dx + dy * dy),
+        fabs = window.gravity * points[i].m * points[j].m / (r*r);
+    
+    fX += fabs * dx / r;
+    fY += fabs * dy / r;
+  }
+  acc.x = fX/points[i].m;
+  acc.y = fY/points[i].m;
+  return acc;
+}
+
 
 var EulerMethod = function(points){
-  CalcForces(points);
   for (var i = 0; i < points.length; i++) {
-    if (points[i] === undefined){
-      continue;
-    }
-    // F=ma
-    var aX = points[i].forceX* window.dt / points[i].m;
-    var aY = points[i].forceY* window.dt / points[i].m;
+
+    var acc = a(i, points,0,0);
     
-    points[i].x += (points[i].vx + aX/2) * window.dt;
-    points[i].y += (points[i].vy + aY/2) * window.dt;
+    points[i].x += (points[i].vx + acc.x * window.dt/2) * window.dt;
+    points[i].y += (points[i].vy + acc.y * window.dt/2) * window.dt;
     
-    points[i].vx = points[i].vx + aX;
-    points[i].vy = points[i].vy + aY;
-    
-    points[i].forceX = 0;
-    points[i].forceY = 0;
-    
+    points[i].vx += acc.x * window.dt;
+    points[i].vy += acc.y * window.dt;
   }
 };
 
 
 var EulerMethodBetter = function(points){
-  CalcForcesWith(points);
+  CalcForces(points);
   for (var i = 0; i < points.length; i++) {
     if (points[i] === undefined){
       continue;
     }
     
-    var aX = points[i].forceX* window.dt / points[i].m;
-    var aY = points[i].forceY* window.dt / points[i].m;
+    var aX = points[i].forceX/points[i].m;
+    var aY = points[i].forceY/points[i].m;
     
-    points[i].x += (points[i].vx + aX/2) * window.dt;
-    points[i].y += (points[i].vy + aY/2) * window.dt;
+    points[i].x += (points[i].vx + aX*window.dt/2) * window.dt;
+    points[i].y += (points[i].vy + aY*window.dt/2) * window.dt;
     
-    points[i].vx = points[i].vx + aX;
-    points[i].vy = points[i].vy + aY;
+    points[i].vx += aX*window.dt;
+    points[i].vy += aY*window.dt;
     
     points[i].forceX = 0;
     points[i].forceY = 0;
@@ -363,34 +356,12 @@ function P(_x, _y){
 }
 
 
-
-// ds/dt = v
-// dv/dt = a
-var a = function(i, points, parX, parY){
-  var acc = new P(0, 0);
-  
-  for (var j = 0; j < 3; j++) {
-    if (i == j) continue;
-    
-    var dx = points[i].x + parX - points[j].x ,
-        dy = points[i].y + parY - points[j].y,
-        r = Math.sqrt(dx * dx + dy * dy);
-    
-    acc.x += window.gravity * points[j].m/(r*r) ;
-    acc.y += window.gravity * points[j].m/(r*r);
-  }
-  
-  return acc;
-}
-
-
-
 var CalcAndDraw = function(points){
  
   // first method
   var ctx = window.canvas.getContext('2d');
   ctx.clearCanvas(window.canvas);
-  EulerMethodBetter(points);
+  RungaKut(points);
   ctx.drawAllPoints(points, window.pathPoints);
   
   // second method
@@ -483,8 +454,8 @@ var TestOnOneLine = function(method, points){
 // points[2] = (new Point(502, 304, "blue", 0, 0, 1));
 // TestM(EulerMethod, points);
 
-// points[0] = (new Point(201, 301, "red", -0.1, 0, 1));
-// points[1] = (new Point(100, 300, "green", 0, 0, 1));
+// points[0] = (new Point(201, 301, "red", -0.2, 0, 1));
+// points[1] = (new Point(100, 300, "green", 0.2, 0, 1));
 // points[2] = (new Point(502, 304, "blue", 0, 0, 1));
 // TestM(EulerMethodBetter, points);
 
